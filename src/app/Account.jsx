@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState, useContext } from "react";
 import { Outlet } from "react-router-dom";
-import { supabase } from "../../supabase";
+import { supabase } from "../supabase"
 import { v4 as uuidv4 } from "uuid";
 import Box from "@mui/material/Box";
 import Modal from "@mui/material/Modal";

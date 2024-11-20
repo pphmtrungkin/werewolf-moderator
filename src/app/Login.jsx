@@ -1,13 +1,13 @@
 import React, { useState } from "react";
-import { supabase } from "../../supabase";
+import { supabase } from "../supabase";
 import { useNavigate } from "react-router-dom";
 import GoogleIcon from "../../img/Icons/search.png";
 import FacebookIcon from "../../img/Icons/facebook.png";
 const Login = () => {
   //Declare variables
   const navigate = useNavigate();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [email, setEmail] = useState("phmtrungkinn@gmail.com");
+  const [password, setPassword] = useState("Phmtrungkin@319");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
 
