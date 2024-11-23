@@ -18,7 +18,7 @@ export const DeckProvider = ({ children }) => {
     async function getSelectedCards() {
       const { data, error } = await supabase
         .from("decks_cards")
-        .select("*")
+        .select("deck_id, card_id")
         .eq("deck_id", user.id);
 
       if (error) {
