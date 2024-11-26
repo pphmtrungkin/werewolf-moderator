@@ -13,12 +13,13 @@ export const DeckProvider = ({ children }) => {
   const { user } = useContext(UserContext);
   const [deckId, setDeckId] = useState(0);
   const [selectedCards, setSelectedCards] = useState([]);
+  const [timer, setTimer] = useState(0);
 
   useEffect(() => {
     async function getSelectedCards() {
       const { data, error } = await supabase
         .from("decks_cards")
-        .select("deck_id, card_id")
+        .select("cards(*)")
         .eq("deck_id", user.id);
 
       if (error) {
@@ -27,11 +28,9 @@ export const DeckProvider = ({ children }) => {
       }
 
       if (data) {
-        setSelectedCards(data);
-        setNumberOfPlayers(data.length);
-        console.log("Selected cards: ", data);
-        console.log("Total: ", total);
-        console.log("Number of players: ", data.length);
+        const allSelectedCards = data.map((item) => item.cards);
+        setSelectedCards(allSelectedCards);
+        console.log("Selected cards: ", allSelectedCards);
       }
       setSelectedCardsLoading(false);
     }
@@ -57,13 +56,49 @@ export const DeckProvider = ({ children }) => {
         console.log("Total: ", total);
       }
     }
+
+    async function getNumberOfPlayers() {
+      const { data, error } = await supabase
+        .from("decks")
+        .select("number_of_players")
+        .eq("id", user.id);
+
+      if (error) {
+        console.log("Error fetching number of players: ", error);
+        return;
+      }
+
+      if (data) {
+        setNumberOfPlayers(data[0].number_of_players);
+        console.log("Number of players: ", numberOfPlayers);
+      }
+    }
+
+    async function getTimer(){
+      const { data, error } = await supabase
+        .from("decks")
+        .select("timer")
+        .eq("id", user.id);
+
+      if (error) {
+        console.log("Error fetching timer: ", error);
+        return;
+      }
+
+      if (data) {
+        console.log("Timer: ", data);
+        setTimer(data[0].timer);
+      }
+    }
     if (user?.id) {
       getSelectedCards();
       getTotalValue(); 
+      getNumberOfPlayers();
+      getTimer();
     }
   }, [user?.id]);
   return (
-    <DeckContext.Provider value={{ selectedCards, setSelectedCards, selectedCardsLoading, numberOfPlayers, setNumberOfPlayers, total, setTotal }}>
+    <DeckContext.Provider value={{ selectedCards, setSelectedCards, selectedCardsLoading, numberOfPlayers, setNumberOfPlayers, total, setTotal, timer, setTimer }}>
       {children}
     </DeckContext.Provider>
   );

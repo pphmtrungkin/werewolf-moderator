@@ -12,7 +12,6 @@ import { set } from "lodash";
 export default function SetUp() {
   const [cards, setCards] = useState([]);
   const [sides, setSides] = useState([]);
-  const [timer, setTimer] = useState(0);
 
   const navigate = useNavigate();
 
@@ -26,6 +25,8 @@ export default function SetUp() {
     selectedCards,
     setSelectedCards,
     selectedCardsLoading,
+    timer,
+    setTimer,
   } = useContext(DeckContext);
 
   const { user } = useContext(UserContext);
@@ -46,7 +47,7 @@ export default function SetUp() {
       // Only allow unselecting cards
       if (cardCount > 0) {
         const newSelectedCards = selectedCards.filter(
-          (selectedCard) => selectedCard.card_id !== card.id
+          (selectedCard) => selectedCard.id !== card.id
         );
         setSelectedCards(newSelectedCards);
         setTotal(total - card.score * cardCount);
@@ -56,12 +57,12 @@ export default function SetUp() {
       if (cardCount < limit) {
         setSelectedCards([
           ...selectedCards,
-          { deck_id: user.id, card_id: card.id },
+          card
         ]);
         setTotal(total + card.score);
       } else if (cardCount === limit) {
         const newSelectedCards = selectedCards.filter(
-          (selectedCard) => selectedCard.card_id !== card.id
+          (selectedCard) => selectedCard.id !== card.id
         );
         setSelectedCards(newSelectedCards);
         setTotal(total - card.score * cardCount);
@@ -71,7 +72,7 @@ export default function SetUp() {
 
   const getCardCount = (card) => {
     return selectedCards.filter(
-      (selectedCard) => selectedCard.card_id === card.id
+      (selectedCard) => selectedCard.id === card.id
     ).length;
   };
 
@@ -165,19 +166,78 @@ export default function SetUp() {
   useEffect(() => {
     console.log("Selected cards: ", selectedCards);
   }, [selectedCards]);
+
+  const updateSelectedCards = async (selectedCards) => {
+    // Update the deck with the selected cards
+
+    const { data: currentSelectedCards, error } = await supabase.from("decks_cards").select("*").eq("deck_id", user.id);
+
+    if (error) {
+      console.log("Error fetching deck cards: ", error);
+      return;
+    }
+
+    // Add the cards that arent in the current selected cards compared to the selected cards
+    // It should add more selections of the same card if the card is selected multiple times
+    const newSelectedCards = selectedCards.filter(
+      (selectedCard) =>
+        !currentSelectedCards.some(
+          (currentSelectedCard) => currentSelectedCard.card_id === selectedCard.id
+        )
+    );
+
+    // Remove the cards that are already in the selected cards compared to the current selected cards
+    const removedSelectedCards = currentSelectedCards.filter(
+      (currentSelectedCard) =>
+        !selectedCards.some(
+          (selectedCard) => selectedCard.id === currentSelectedCard.card_id
+        )
+    );
+
+    console.log("New selected cards: ", newSelectedCards);
+    console.log("Removed selected cards: ", removedSelectedCards);
+
+    // Add the new selected cards
+    for (const newSelectedCard of newSelectedCards) {
+      const { error } = await supabase.from("decks_cards").insert([
+        {
+          deck_id: user.id,
+          card_id: newSelectedCard.id,
+        },
+      ]);
+
+      if (error) {
+        console.log("Error inserting new selected card: ", error);
+        return;
+      }
+    }
+
+    // Remove the removed selected cards
+    for (const removedSelectedCard of removedSelectedCards) {
+      const { error } = await supabase.from("decks_cards").delete().eq("deck_card_id", removedSelectedCard.deck_card_id);
+
+      if (error) {
+        console.log("Error deleting removed selected card: ", error);
+        return;
+      }
+    }
+
+    // Navigate to the game page
+    navigate("/game");
+  };
   return (
     <>
       <Outlet />
       <div className="my-20 mx-60">
         <div className="text-4xl font-semibold text-center">Set Up</div>
-        <hr class="w-4/5 h-1 mx-auto my-4 bg-gray-100 border-0 rounded md:my-8 dark:bg-gray-700" />
+        <hr className="w-4/5 h-1 mx-auto my-4 bg-gray-100 border-0 rounded md:my-8 dark:bg-gray-700" />
         <div className="flex justify-around items-center">
           <button
             className="flex items-center justify-center bg-gray-600 p-3 rounded-lg"
             onClick={() => setNumberOfPlayers(numberOfPlayers - 1)}
           >
             <svg
-              class="w-6 h-6 text-gray-800 dark:text-white"
+              className="w-6 h-6 text-gray-800 dark:text-white"
               aria-hidden="true"
               xmlns="http://www.w3.org/2000/svg"
               width="24"
@@ -187,9 +247,9 @@ export default function SetUp() {
             >
               <path
                 stroke="currentColor"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
                 d="m15 19-7-7 7-7"
               />
             </svg>
@@ -202,7 +262,7 @@ export default function SetUp() {
             onClick={() => setNumberOfPlayers(numberOfPlayers + 1)}
           >
             <svg
-              class="w-6 h-6 text-gray-800 dark:text-white"
+              className="w-6 h-6 text-gray-800 dark:text-white"
               aria-hidden="true"
               xmlns="http://www.w3.org/2000/svg"
               width="24"
@@ -212,18 +272,18 @@ export default function SetUp() {
             >
               <path
                 stroke="currentColor"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
                 d="m9 5 7 7-7 7"
               />
             </svg>
           </button>
         </div>
-        <hr class="w-4/5 h-1 mx-auto my-4 bg-gray-100 border-0 rounded md:my-8 dark:bg-gray-700" />
+        <hr className="w-4/5 h-1 mx-auto my-4 bg-gray-100 border-0 rounded md:my-8 dark:bg-gray-700" />
         
         <p className="text-center text-2xl font-semibold">Total: {total}</p>
-        <hr class="w-4/5 h-1 mx-auto my-4 bg-gray-100 border-0 rounded md:my-8 dark:bg-gray-700" />
+        <hr className="w-4/5 h-1 mx-auto my-4 bg-gray-100 border-0 rounded md:my-8 dark:bg-gray-700" />
         
         <div className="flex justify-around items-center my-8">
           {sides.map((side) => (
@@ -247,18 +307,17 @@ export default function SetUp() {
             {filteredCards.map((card) => (
               <Card
                 key={card.id}
-                title={card.title}
-                link={card.link}
+                {...card}
                 onSelect={() => handleCardSelect(card)}
                 count={getCardCount(card)}
                 selected={selectedCards.some(
-                  (selectedCard) => selectedCard.card_id === card.id
+                  (selectedCard) => selectedCard.id === card.id
                 )}
               />
             ))}
           </div>
         )}
-        <hr class="w-4/5 h-1 mx-auto my-4 bg-gray-100 border-0 rounded md:my-8 dark:bg-gray-700" />
+        <hr className="w-4/5 h-1 mx-auto my-4 bg-gray-100 border-0 rounded md:my-8 dark:bg-gray-700" />
         <h1 className="text-4xl text-center font-semibold">Timer</h1>
         <div className="flex justify-around items-center my-8">
         <button
@@ -266,7 +325,7 @@ export default function SetUp() {
             onClick={() => setTimer(timer - 1)}
           >
             <svg
-              class="w-6 h-6 text-gray-800 dark:text-white"
+              className="w-6 h-6 text-gray-800 dark:text-white"
               aria-hidden="true"
               xmlns="http://www.w3.org/2000/svg"
               width="24"
@@ -276,9 +335,9 @@ export default function SetUp() {
             >
               <path
                 stroke="currentColor"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
                 d="m15 19-7-7 7-7"
               />
             </svg>
@@ -291,7 +350,7 @@ export default function SetUp() {
             onClick={() => setTimer(timer + 1)}
           >
             <svg
-              class="w-6 h-6 text-gray-800 dark:text-white"
+              className="w-6 h-6 text-gray-800 dark:text-white"
               aria-hidden="true"
               xmlns="http://www.w3.org/2000/svg"
               width="24"
@@ -301,16 +360,16 @@ export default function SetUp() {
             >
               <path
                 stroke="currentColor"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
                 d="m9 5 7 7-7 7"
               />
             </svg>
           </button>
         </div>
         <div className="flex justify-center mt-14">
-          <button onClick={() => navigate("/game")} className="bg-gray-300 text-black text-2xl font-semibold py-4 w-4/5 mx-auto rounded-xl">
+          <button onClick={() => updateSelectedCards(selectedCards)} className="bg-gray-300 text-black text-2xl font-semibold py-4 w-4/5 mx-auto rounded-xl">
             Start Game
           </button>
         </div>
