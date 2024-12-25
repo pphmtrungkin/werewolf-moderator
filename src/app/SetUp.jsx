@@ -222,6 +222,12 @@ export default function SetUp() {
       }
     }
 
+    // Update the number of players and timer
+    const { error: updateError } = await supabase.from("decks").update({ number_of_players: numberOfPlayers, timer: timer }).eq("id", user.id);
+    if (updateError) {
+      console.log("Error updating number of players and timer: ", error);
+      return;
+    }
     // Navigate to the game page
     navigate("/game");
   };

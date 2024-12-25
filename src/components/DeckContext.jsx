@@ -19,7 +19,7 @@ export const DeckProvider = ({ children }) => {
     async function getSelectedCards() {
       const { data, error } = await supabase
         .from("decks_cards")
-        .select("cards(*)")
+        .select(`deck_card_id, cards (*)`)
         .eq("deck_id", user.id);
 
       if (error) {
@@ -28,7 +28,16 @@ export const DeckProvider = ({ children }) => {
       }
 
       if (data) {
-        const allSelectedCards = data.map((item) => item.cards);
+        console.log("Data: ", data);
+        const allSelectedCards = data.map((item) => {
+          if (item.deck_card_id && item.cards) {
+            return {
+              ...item.cards,
+              deck_card_id: item.deck_card_id,
+            };
+          }
+          return null;
+        }).filter(item => item !== null); // Filter out any null values
         setSelectedCards(allSelectedCards);
         console.log("Selected cards: ", allSelectedCards);
       }
