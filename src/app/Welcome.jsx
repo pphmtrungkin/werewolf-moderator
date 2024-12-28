@@ -25,7 +25,7 @@ function Welcome() {
           className="bg-white px-5 py-3 rounded-full relative animate__animated animate__pulse animate__delay-2s animate__infinite"
           onClick={() => {
             {
-              !user ? navigate("/login") : navigate("/setup");
+              !user ? navigate("/login") : navigate("/players");
             }
           }}
         >

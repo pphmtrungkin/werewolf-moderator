@@ -15,6 +15,7 @@ import Nav from './components/Nav';
 import Account from './app/Account';
 import ErrorPage from './components/ErrorPage';
 import Game from './app/Game'
+import Players from './app/Players'
 import {DeckProvider} from './components/DeckContext'
 import { UserProvider } from './components/UserContext';
 function App() {
@@ -34,6 +35,16 @@ function App() {
     {
       path: "/setup",
       element: <SetUp />,
+      children: [
+        {
+          path: "",
+          element: <Nav />,
+        },
+      ],
+    },
+    {
+      path: "/players",
+      element: <Players />,
       children: [
         {
           path: "",

@@ -228,8 +228,8 @@ export default function SetUp() {
       console.log("Error updating number of players and timer: ", error);
       return;
     }
-    // Navigate to the game page
-    navigate("/game");
+    // Navigate to the players page
+    navigate("/players");
   };
   return (
     <>
@@ -376,7 +376,7 @@ export default function SetUp() {
         </div>
         <div className="flex justify-center mt-14">
           <button onClick={() => updateSelectedCards(selectedCards)} className="bg-gray-300 text-black text-2xl font-semibold py-4 w-4/5 mx-auto rounded-xl">
-            Start Game
+            Next Step
           </button>
         </div>
       </div>

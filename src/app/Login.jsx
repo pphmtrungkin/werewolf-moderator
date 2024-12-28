@@ -24,7 +24,7 @@ const Login = () => {
       alert(error.error_description || error.message);
     } else {
       alert("Logged in");
-      navigate("/setup");
+      navigate("/players");
     }
     setLoading(false);
   };

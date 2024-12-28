@@ -9,6 +9,7 @@ const SignUp = () => {
   //Declare variables
   const [email, setEmail] = useState("");
   const [username, setUsername] = useState("");
+  const [full_name, setFullName] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [confirmPass, setConfirmPass] = useState("");
@@ -25,10 +26,7 @@ const SignUp = () => {
         email: email,
         password: password,
         options: {
-          data: {
-            email: email,
-            username: username,
-          },
+          data: { full_name: full_name, username: username },
         },
       });
       setLoading(false);
@@ -71,6 +69,15 @@ const SignUp = () => {
             placeholder="Username"
             value={username}
             onChange={(e) => setUsername(e.target.value)}
+            className="bg-[#241F21] border-b-2 border-b-white  text-left font-medium text-lg py-3 pl-2 w-2/5"
+          />
+        </div>
+        <div className="flex justify-center my-2 ">
+          <input
+            type="text"
+            placeholder="Full Name"
+            value={full_name}
+            onChange={(e) => setFullName(e.target.value)}
             className="bg-[#241F21] border-b-2 border-b-white  text-left font-medium text-lg py-3 pl-2 w-2/5"
           />
         </div>

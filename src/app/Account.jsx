@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState, useContext } from "react";
 import { Outlet } from "react-router-dom";
-import { supabase } from "../supabase"
+import { supabase } from "../supabase";
 import { v4 as uuidv4 } from "uuid";
 import Box from "@mui/material/Box";
 import Modal from "@mui/material/Modal";
@@ -80,32 +80,16 @@ const SideBar = ({ selectedButton, setSelectedButton }) => {
     </div>
   );
 };
-const style = {
-  position: "absolute",
-  top: "50%",
-  left: "50%",
-  transform: "translate(-50%, -50%)",
-  display: "flex",
-  justifyContent: "center",
-  flexDirection: "column",
-  alignItems: "center",
-  width: "40%",
-  bgcolor: "#241F21",
-  border: "2px solid #000",
-  boxShadow: 24,
-  pt: 2,
-  px: 4,
-  pb: 3,
-};
+
 const AccountSetting = ({ user }) => {
   const navigate = useNavigate();
 
   const [loading, setLoading] = useState(false);
   const [imageFile, setImageFile] = useState([]);
-  const [images, setImages] = useState([]);
+  const [imgPath, setImgPath] = useState("");
   const [fileUrl, setFileUrl] = useState(null);
   const [avatarUrl, setAvatarUrl] = useState("");
-  const [open, setOpen] = useState(false);
+  const [isOverlayOpen, setIsOverlayOpen] = useState(false);
 
   // variables for input check
   const [fullName, setFullName] = useState("");
@@ -127,7 +111,7 @@ const AccountSetting = ({ user }) => {
     async function getProfile() {
       const { data, error } = await supabase
         .from("profiles")
-        .select(`username, full_name, email, phone, avatar_url`)
+        .select(`username, full_name, phone, avatar_url`)
         .eq("id", user.id)
         .single();
       setLoading(true);
@@ -137,12 +121,13 @@ const AccountSetting = ({ user }) => {
         console.log(data);
         if (data.username) setUsername(data.username);
         setFullName(data.full_name);
+        setEmail(user.email);
         if (data.phone) setPhoneNumber(data.phone);
-        setEmail(data.email);
         setAvatarUrl(data.avatar_url);
       }
       setLoading(false);
     }
+
     getProfile();
   }, []);
 
@@ -153,14 +138,13 @@ const AccountSetting = ({ user }) => {
       .update({
         username,
         full_name: fullName,
-        email,
         phone: phoneNumber,
       })
       .eq("id", user.id);
+
     const { error: updateError } = await supabase.auth.updateUser({
+      email: email,
       data: {
-        email,
-        phone: phoneNumber,
         username: username,
         full_name: fullName,
       },
@@ -174,11 +158,8 @@ const AccountSetting = ({ user }) => {
     setLoading(false);
   };
 
-  const handleOpen = () => {
-    setOpen(true);
-  };
   const handleClose = () => {
-    setOpen(false);
+   setIsOverlayOpen(false);
     setFileUrl(null);
   };
   const onImageChange = (e) => {
@@ -217,6 +198,7 @@ const AccountSetting = ({ user }) => {
   const uploadPicture = async (e) => {
     e.preventDefault();
     const filename = `${user.id}/${uuidv4()}`;
+    setImgPath(filename);
     const { data, error } = await supabase.storage
       .from("avatars")
       .upload(filename, imageFile, {
@@ -235,27 +217,12 @@ const AccountSetting = ({ user }) => {
 
   //Still cannot delete the file path
   const deleteAvatar = async () => {
+    console.log(imgPath);
     const { data, error } = await supabase.storage
       .from("avatars")
-      .remove([user.id]);
+      .remove([imgPath]);
     if (error) {
       console.error("Error deleting image: ", error);
-    } else {
-      const { error: updateError } = await supabase.auth.updateUser({
-        data: { avatar_url: null },
-      });
-      const { updateError: updateError2 } = await supabase
-        .from("profiles")
-        .update({ avatar_url: null })
-        .eq("id", user.id);
-      if (updateError && updateError2) {
-        console.error("Error updating user profile: ", updateError);
-      } else {
-        setFileUrl(null);
-        setImageFile([]);
-        setAvatarUrl(null);
-        console.log("Image deleted successfully");
-      }
     }
   };
 
@@ -337,7 +304,7 @@ const AccountSetting = ({ user }) => {
               <button
                 type="button"
                 className="bg-blue-500 h-max p-2 px-4 rounded-lg"
-                onClick={handleOpen}
+                onClick={() => setIsOverlayOpen(true)}
               >
                 <p className="text-white font-semibold">Upload new picture</p>
               </button>
@@ -373,87 +340,91 @@ const AccountSetting = ({ user }) => {
             </button>
           </div>
           <div>
-            <Modal
-              aria-labelledby="transition-modal-title"
-              aria-describedby="transition-modal-description"
-              open={open}
-              onClose={handleClose}
-              closeAfterTransition
-              slots={{ backdrop: Backdrop }}
-              slotProps={{
-                backdrop: {
-                  timeout: 100,
-                },
-              }}
-            >
-              <Fade in={open}>
-                <Box sx={style}>
-                  <div id="transition-modal-title" className="flex">
-                    <h3 className="text-lg font-semibold">Profile Photo</h3>
+            {isOverlayOpen && 
+            <div className="fixed inset-0 bg-[#231F20] bg-opacity-80 flex items-center justify-center z-40">
+            <div className="flex flex-col items-center justify-center w-2/5 border-2 bg-[#231F20] dark:border-gray-600 rounded-lg z-50 p-8">
+              <button
+                className="self-end text-gray-500 dark:text-gray-400"
+                onClick={() => setIsOverlayOpen(false)}
+              >
+                <svg
+                  class="w-12 h-12 text-gray-800 dark:text-white"
+                  aria-hidden="true"
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke="currentColor"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="m15 9-6 6m0-6 6 6m6-3a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
+                  />
+                </svg>
+              </button>
+              <div>
+                {fileUrl !== null ? (
+                  <div className="w-80 h-80 rounded-full overflow-hidden my-8">
+                    <img
+                      src={fileUrl}
+                      alt="preview"
+                      className="w-80 h-80 object-cover rounded-lg"
+                    />
                   </div>
-                  {!fileUrl ? (
-                    <div className="flex items-center justify-center w-full mt-4">
-                      <label
-                        htmlFor="dropzone-file"
-                        className="flex flex-col items-center justify-center w-full h-64 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 dark:hover:bg-bray-800 dark:bg-gray-700 hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-gray-600"
+                ) : (
+                  <label
+                    htmlFor="dropzone-file"
+                    className="flex flex-col items-center justify-center w-80 h-80 border-2 border-gray-300 border-dashed rounded-full cursor-pointer bg-gray-50 dark:bg-gray-700 hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-gray-600"
+                  >
+                    <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                      <svg
+                        className="w-8 h-8 mb-4 text-gray-500 dark:text-gray-400"
+                        aria-hidden="true"
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 20 16"
                       >
-                        <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                          <svg
-                            className="w-8 h-8 mb-4 text-gray-500 dark:text-gray-400"
-                            aria-hidden="true"
-                            xmlns="http://www.w3.org/2000/svg"
-                            fill="none"
-                            viewBox="0 0 20 16"
-                          >
-                            <path
-                              stroke="currentColor"
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth="2"
-                              d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2"
-                            />
-                          </svg>
-                          <p className="mb-2 text-sm text-gray-500 dark:text-gray-400">
-                            <span className="font-semibold">
-                              Click to upload
-                            </span>{" "}
-                            or drag and drop
-                          </p>
-                          <p className="text-xs text-gray-500 dark:text-gray-400">
-                            SVG, PNG, JPG or GIF (MAX. 800x400px)
-                          </p>
-                        </div>
-                        <input
-                          id="dropzone-file"
-                          type="file"
-                          className="hidden"
-                          onChange={(e) => onImageChange(e)}
+                        <path
+                          stroke="currentColor"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="2"
+                          d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2"
                         />
-                      </label>
+                      </svg>
+                      <p className="mb-2 text-sm text-gray-500 dark:text-gray-400">
+                        <span className="font-semibold">Click to upload</span>{" "}
+                        or drag and drop
+                      </p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400">
+                        SVG, PNG, JPG or GIF (MAX. 800x400px)
+                      </p>
                     </div>
-                  ) : (
-                    <>
-                      <img
-                        src={fileUrl}
-                        className="h-80 w-80 max-w-full rounded-full object-cover my-8"
-                      />
-                      <button
-                        type="button"
-                        className="bg-white p-2 px-4 rounded-full"
-                        onClick={(e) => uploadPicture(e)}
-                      >
-                        <h3
-                          id="transition-modal-description"
-                          className=" text-black uppercase text-lg font-semibold"
-                        >
-                          Upload
-                        </h3>
-                      </button>
-                    </>
-                  )}
-                </Box>
-              </Fade>
-            </Modal>
+                    <input
+                      id="dropzone-file"
+                      type="file"
+                      className="hidden"
+                      onChange={onImageChange}
+                    />
+                  </label>
+                )}
+              </div>
+              {fileUrl && (
+                <div>
+                  <button
+                    className="w-96 h-12 my-8 bg-gray-500 text-white rounded-lg hover:bg-white hover:text-gray-800 text-lg font-semibold"
+                    onClick={uploadPicture}
+                  >
+                    Upload
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+            }
           </div>
           <fieldset disabled={toggleDisable}>
             <form onSubmit={(e) => updateProfile(e)}>
