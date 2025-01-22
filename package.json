@@ -10,21 +10,17 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@emotion/react": "^11.11.3",
-    "@emotion/styled": "^11.11.0",
+    "@material-tailwind/html": "^2.3.2",
+    "@material-tailwind/react": "^2.1.10",
     "@mui/icons-material": "^5.15.6",
     "@supabase/supabase-js": "^2.39.8",
     "animate.css": "^4.1.1",
     "dotenv": "^16.4.5",
     "env": "^0.0.2",
-    "flowbite": "^2.5.2",
-    "flowbite-react": "^0.10.2",
-    "lodash": "^4.17.21",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.28.0",
-    "react-scripts": "^5.0.1",
-    "uuidv4": "^6.2.13"
+    "react-scripts": "^5.0.1"
   },
   "devDependencies": {
     "@types/react": "^18.2.43",
@@ -36,8 +32,7 @@
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-react-refresh": "^0.4.5",
     "postcss": "^8.4.33",
-    "process": "^0.11.10",
-    "tailwindcss": "^3.4.1",
+    "tailwindcss": "^3.4.17",
     "vite": "^5.0.8"
   }
 }

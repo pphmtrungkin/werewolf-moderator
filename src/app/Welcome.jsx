@@ -1,8 +1,6 @@
 import React, { useState, useEffect, useContext } from "react";
-import { supabase } from "../supabase";
 import { useNavigate } from "react-router-dom";
 import { UserContext } from "../components/UserContext";
-import Data from "../components/Data";
 
 function Welcome() {
   const {user} = useContext(UserContext);
@@ -22,10 +20,10 @@ function Welcome() {
       </h2>
       <div className="flex justify-center mt-10">
         <button
-          className="bg-white px-5 py-3 rounded-full relative animate__animated animate__pulse animate__delay-2s animate__infinite"
+          className="bg-white px-5 py-3 rounded-full relative sanimate__pulse animate__delay-2s animate__repeat-3"
           onClick={() => {
             {
-              !user ? navigate("/login") : navigate("/players");
+              !user ? navigate("/login") : navigate("/setup");
             }
           }}
         >
@@ -33,26 +31,6 @@ function Welcome() {
             Press to continue
           </h2>
         </button>
-        {/* <button
-          className="bg-white px-5 py-3 rounded-full relative animate__animated animate__pulse animate__delay-2s animate__infinite"
-          onClick={() => {
-            async function updateData() {
-              const { data, error } = await supabase
-                .from("cards")
-                .upsert(Data).in("title", Data.map((card) => card.title)).select();
-              if (error) {
-                console.log(error.message);
-              } else {
-                console.log(data);
-              }
-            }
-            updateData();
-          }}
-        >
-          <h2 className="text-black text-2xl font-semibold p-1 px-2">
-            Update Cards
-          </h2>
-        </button> */}
       </div>
     </div>
   );

@@ -5,6 +5,7 @@
     html {
         font-family: 'Montserrat', sans-serif;
         scroll-behavior: smooth;
+        scrollbar-width: thin;
     }
     html::-webkit-scrollbar {
         background-color: #231F20;

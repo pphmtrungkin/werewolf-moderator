@@ -1,14 +1,9 @@
 import React, { useEffect, useRef, useState, useContext } from "react";
 import { Outlet } from "react-router-dom";
 import { supabase } from "../supabase";
-import { v4 as uuidv4 } from "uuid";
-import Box from "@mui/material/Box";
-import Modal from "@mui/material/Modal";
-import Fade from "@mui/material/Fade";
-import Backdrop from "@mui/material/Backdrop";
 import { useNavigate } from "react-router-dom";
 import { UserContext } from "../components/UserContext";
-import { set } from "lodash";
+
 const Spinner = () => {
   return (
     <div className="flex justify-center items-center">
@@ -136,7 +131,7 @@ const AccountSetting = ({ user }) => {
     const { error } = await supabase
       .from("profiles")
       .update({
-        username,
+        username: username,
         full_name: fullName,
         phone: phoneNumber,
       })
@@ -197,7 +192,7 @@ const AccountSetting = ({ user }) => {
   };
   const uploadPicture = async (e) => {
     e.preventDefault();
-    const filename = `${user.id}/${uuidv4()}`;
+    const filename = `${user.id}/profile`;
     setImgPath(filename);
     const { data, error } = await supabase.storage
       .from("avatars")
@@ -215,14 +210,27 @@ const AccountSetting = ({ user }) => {
     }
   };
 
-  //Still cannot delete the file path
   const deleteAvatar = async () => {
+    const imgPath = `${user.id}/profile`;
     console.log(imgPath);
-    const { data, error } = await supabase.storage
+    const { data: removeData, error } = await supabase.storage
       .from("avatars")
       .remove([imgPath]);
     if (error) {
       console.error("Error deleting image: ", error);
+    } else {
+      console.log("Image deleted successfully", removeData);
+      setAvatarUrl("");
+      const { error } = await supabase.auth.updateUser({
+        data: { avatar_url: null },
+      });
+      const { updateError } = await supabase
+        .from("profiles")
+        .update({ avatar_url: null })
+        .eq("id", user.id);
+      if (error && updateError) {
+        console.error("Error updating user profile: ", error);
+      }
     }
   };
 

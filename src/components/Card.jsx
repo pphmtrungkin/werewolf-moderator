@@ -6,7 +6,7 @@ export default function Card({
   selected,
 }) {
   return (
-    <div className="relative inline-block m-2 w-80">
+    <div className="relative inline-block m-2">
       <button onClick={onSelect} className={`relative border-none p-0 bg-none ${selected ? 'grayscale-0' : 'grayscale'}`}>
         <img src={link} alt={title} className="block" />
         {count > 1 && (

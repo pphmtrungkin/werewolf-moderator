@@ -7,7 +7,7 @@ const Login = () => {
   //Declare variables
   const navigate = useNavigate();
   const [email, setEmail] = useState("phmtrungkinn@gmail.com");
-  const [password, setPassword] = useState("Phmtrungkin@319");
+  const [password, setPassword] = useState("zzxxccvv,.");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
 
@@ -24,7 +24,7 @@ const Login = () => {
       alert(error.error_description || error.message);
     } else {
       alert("Logged in");
-      navigate("/players");
+      navigate("/setup");
     }
     setLoading(false);
   };

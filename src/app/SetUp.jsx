@@ -7,7 +7,6 @@ import Card from "../components/Card";
 import { useNavigate, Outlet } from "react-router-dom";
 import UserContext from "../components/UserContext";
 import Spinner from "../components/Spinner";
-import { set } from "lodash";
 
 export default function SetUp() {
   const [cards, setCards] = useState([]);
@@ -243,7 +242,7 @@ export default function SetUp() {
             onClick={() => setNumberOfPlayers(numberOfPlayers - 1)}
           >
             <svg
-              className="w-6 h-6 text-gray-800 dark:text-white"
+              className="w-6 h-6 dark:text-white text-black"
               aria-hidden="true"
               xmlns="http://www.w3.org/2000/svg"
               width="24"
@@ -268,7 +267,7 @@ export default function SetUp() {
             onClick={() => setNumberOfPlayers(numberOfPlayers + 1)}
           >
             <svg
-              className="w-6 h-6 text-gray-800 dark:text-white"
+              className="w-6 h-6 dark:text-white"
               aria-hidden="true"
               xmlns="http://www.w3.org/2000/svg"
               width="24"
@@ -309,7 +308,7 @@ export default function SetUp() {
             <Spinner />
           </div>
         ) : (
-          <div className="flex-wrap items-center justify-center text-center">
+          <div className="grid grid-cols-4 gap-2">
             {filteredCards.map((card) => (
               <Card
                 key={card.id}
@@ -375,9 +374,12 @@ export default function SetUp() {
           </button>
         </div>
         <div className="flex justify-center mt-14">
-          <button onClick={() => updateSelectedCards(selectedCards)} className="bg-gray-300 text-black text-2xl font-semibold py-4 w-4/5 mx-auto rounded-xl">
-            Next Step
-          </button>
+        <button
+              className="w-1/3 h-12 bg-gray-500 text-white rounded-lg hover:bg-white hover:text-gray-800 text-lg font-semibold"
+              onClick={() => updateSelectedCards(selectedCards)}
+            >
+              Next Step
+            </button>
         </div>
       </div>
     </>
