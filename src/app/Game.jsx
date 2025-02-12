@@ -24,8 +24,7 @@ const Game = () => {
     newCardHolder[index] = value;
     setCardHolder(newCardHolder);
     console.log("Card Holders: " + newCardHolder);
-    }
-  };
+  }
 
   const handleTargetHolderChange = (index, value) => {
     const newTargetHolder = [...targetHolder];
@@ -202,13 +201,13 @@ const Game = () => {
               <div className="flex space-x-4">
                 <button
                   onClick={() => navigate("/setup")}
-                  className="bg-red-500 text-white px-4 py-2 rounded"
+                  className="bg-red-500 text-white px-4 py-2 rounded-sm"
                 >
                   Yes, Cancel this game
                 </button>
                 <button
                   onClick={() => setShowModal(false)}
-                  className="bg-gray-500 text-white px-4 py-2 rounded"
+                  className="bg-gray-500 text-white px-4 py-2 rounded-sm"
                 >
                   Close
                 </button>
@@ -405,4 +404,5 @@ const PlayerSelect = ({ handleSelectChange, players, index, currentCard }) => {
     </div>
   );
 };
+}
 export default Game;

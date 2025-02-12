@@ -235,7 +235,7 @@ export default function SetUp() {
       <Outlet />
       <div className="my-20 mx-60">
         <div className="text-4xl font-semibold text-center">Set Up</div>
-        <hr className="w-4/5 h-1 mx-auto my-4 bg-gray-100 border-0 rounded md:my-8 dark:bg-gray-700" />
+        <hr className="w-4/5 h-1 mx-auto my-4 bg-gray-100 border-0 rounded-sm md:my-8 dark:bg-gray-700" />
         <div className="flex justify-around items-center">
           <button
             className="flex items-center justify-center bg-gray-600 p-3 rounded-lg"
@@ -285,10 +285,10 @@ export default function SetUp() {
             </svg>
           </button>
         </div>
-        <hr className="w-4/5 h-1 mx-auto my-4 bg-gray-100 border-0 rounded md:my-8 dark:bg-gray-700" />
+        <hr className="w-4/5 h-1 mx-auto my-4 bg-gray-100 border-0 rounded-sm md:my-8 dark:bg-gray-700" />
         
         <p className="text-center text-2xl font-semibold">Total: {total}</p>
-        <hr className="w-4/5 h-1 mx-auto my-4 bg-gray-100 border-0 rounded md:my-8 dark:bg-gray-700" />
+        <hr className="w-4/5 h-1 mx-auto my-4 bg-gray-100 border-0 rounded-sm md:my-8 dark:bg-gray-700" />
         
         <div className="flex justify-around items-center my-8">
           {sides.map((side) => (
@@ -322,7 +322,7 @@ export default function SetUp() {
             ))}
           </div>
         )}
-        <hr className="w-4/5 h-1 mx-auto my-4 bg-gray-100 border-0 rounded md:my-8 dark:bg-gray-700" />
+        <hr className="w-4/5 h-1 mx-auto my-4 bg-gray-100 border-0 rounded-sm md:my-8 dark:bg-gray-700" />
         <h1 className="text-4xl text-center font-semibold">Timer</h1>
         <div className="flex justify-around items-center my-8">
         <button
