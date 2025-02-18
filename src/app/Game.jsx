@@ -24,7 +24,7 @@ const Game = () => {
     newCardHolder[index] = value;
     setCardHolder(newCardHolder);
     console.log("Card Holders: " + newCardHolder);
-  }
+  };
 
   const handleTargetHolderChange = (index, value) => {
     const newTargetHolder = [...targetHolder];
@@ -32,28 +32,34 @@ const Game = () => {
     setTargetHolder(newTargetHolder);
     console.log("Target Holders: " + newTargetHolder);
   };
+
   const fetchPlayers = async () => {
-      const { data, error } = await supabase
-        .from("players")
-        .select("*")
-        .eq("user_id", user.id);
-      if (error) {
-        console.error("Error fetching players: ", error.message);
-        return;
-      }
-      setPlayers(data);
+    const { data, error } = await supabase
+      .from("players")
+      .select("*")
+      .eq("user_id", user.id);
+    if (error) {
+      console.error("Error fetching players: ", error.message);
+      return;
+    }
+    setPlayers(data);
   };
 
   const fetchGameId = async () => {
-      const { data, error } = await supabase.from("games").select("id").eq("deck_id", user.id).order("id", { ascending: false }).limit(1);
-      if (error) {
-        console.error("Error fetching game id: ", error.message);
-        return;
-      }
-      // get the most recent game id
-      setGameId(data[0].id);
-      console.log("Game ID: ", data[0].id);
-  }
+    const { data, error } = await supabase
+      .from("games")
+      .select("id")
+      .eq("deck_id", user.id)
+      .order("id", { ascending: false })
+      .limit(1);
+    if (error) {
+      console.error("Error fetching game id: ", error.message);
+      return;
+    }
+    // get the most recent game id
+    setGameId(data[0].id);
+    console.log("Game ID: ", data[0].id);
+  };
 
   useEffect(() => {
     if (user) {
@@ -93,9 +99,10 @@ const Game = () => {
     }
 
     for (let i = 0; i < actions.length; i++) {
-    setCardHolder([]);
-    setTargetHolder([]);
-    setCurrentCard((prev) => (prev + 1) % length);
+      setCardHolder([]);
+      setTargetHolder([]);
+      setCurrentCard((prev) => (prev + 1) % length);
+    }
   };
 
   const handlePrev = () => {
@@ -111,12 +118,11 @@ const Game = () => {
     console.log("Actions: ", actions);
   }, [currentCard, uniqueCards]);
 
-
   const inputBox = (count) => {
     const inputs = [];
     for (let i = 0; i < count; i++) {
       inputs.push(
-        <div key={i} className={`flex items-center ${count > 1 ? 'mb-4' : ''}`}>
+        <div key={i} className={`flex items-center ${count > 1 ? "mb-4" : ""}`}>
           <PlayerSelect
             selectedCard={cardHolder}
             handleSelectChange={handleCardHolderChange}
@@ -134,7 +140,7 @@ const Game = () => {
     const inputs = [];
     for (let i = 0; i < count; i++) {
       inputs.push(
-        <div key={i} className={`flex items-center ${count > 1 ? 'mb-4' : ''}`}>
+        <div key={i} className={`flex items-center ${count > 1 ? "mb-4" : ""}`}>
           <div className="">
             <PlayerSelect
               selectedCard={targetHolder}
@@ -217,7 +223,10 @@ const Game = () => {
         </div>
       )}
       <div className="absolute right-12 top-4 p-4">
-        <button onClick={() => setShowModal(true)} className="hover:bg-gray-200 rounded-full font-bold">
+        <button
+          onClick={() => setShowModal(true)}
+          className="hover:bg-gray-200 rounded-full font-bold"
+        >
           <svg
             className="w-14 h-14 text-gray-800 dark:text-white dark:hover:text-gray-800 p-2"
             aria-hidden="true"
@@ -241,7 +250,10 @@ const Game = () => {
         {length > 0 && (
           <div className="flex items-center mb-4">
             {currentCard !== 0 && (
-              <button onClick={handlePrev} className="mr-4 absolute left-1/4 hover:bg-gray-200 rounded-full font-bold">
+              <button
+                onClick={handlePrev}
+                className="mr-4 absolute left-1/4 hover:bg-gray-200 rounded-full font-bold"
+              >
                 <svg
                   className="w-12 h-12 text-gray-800 dark:text-white dark:hover:text-gray-800 p-2"
                   aria-hidden="true"
@@ -268,30 +280,37 @@ const Game = () => {
                   alt={uniqueCards[currentCard].title}
                   className="w-96 h-auto mx-20"
                 />
-                <h2 className="mt-2 font-semibold capitalize text-lg">{uniqueCards[currentCard].title}</h2>
+                <h2 className="mt-2 font-semibold capitalize text-lg">
+                  {uniqueCards[currentCard].title}
+                </h2>
               </div>
             )}
-            {(currentCard !== length - 1 && cardHolder.length > 0 && targetHolder.length > 0) && (
-              <button onClick={handleNext} className="ml-4 absolute right-1/4 hover:bg-gray-200 rounded-full font-bold animate__animated animate__pulse animate__repeat-3">
-                <svg
-                  className="w-12 h-12 text-gray-800 dark:text-white dark:hover:text-gray-800 p-2"
-                  aria-hidden="true"
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="24"
-                  height="24"
-                  fill="none"
-                  viewBox="0 0 24 24"
+            {currentCard !== length - 1 &&
+              cardHolder.length > 0 &&
+              targetHolder.length > 0 && (
+                <button
+                  onClick={handleNext}
+                  className="ml-4 absolute right-1/4 hover:bg-gray-200 rounded-full font-bold animate__animated animate__pulse animate__repeat-3"
                 >
-                  <path
-                    stroke="currentColor"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="m9 5 7 7-7 7"
-                  />
-                </svg>
-              </button>
-            )}
+                  <svg
+                    className="w-12 h-12 text-gray-800 dark:text-white dark:hover:text-gray-800 p-2"
+                    aria-hidden="true"
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke="currentColor"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="m9 5 7 7-7 7"
+                    />
+                  </svg>
+                </button>
+              )}
           </div>
         )}
         <div className="flex items-center justify-around gap-x-8">
@@ -299,22 +318,22 @@ const Game = () => {
           <div>
             {uniqueCards[currentCard].number_of_targets > 0 && (
               <svg
-              className="w-6 h-6 text-gray-800 dark:text-white"
-              aria-hidden="true"
-              xmlns="http://www.w3.org/2000/svg"
-              width="24"
-              height="24"
-              fill="none"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke="currentColor"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="m7 16 4-4-4-4m6 8 4-4-4-4"
-              />
-            </svg>
+                className="w-6 h-6 text-gray-800 dark:text-white"
+                aria-hidden="true"
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                fill="none"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke="currentColor"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="m7 16 4-4-4-4m6 8 4-4-4-4"
+                />
+              </svg>
             )}
           </div>
           {players && <div>{inputTargetBoxes}</div>}
@@ -324,7 +343,12 @@ const Game = () => {
   );
 };
 
-const PlayerSelect = ({ handleSelectChange, players, index, currentCard }) => {
+const PlayerSelect = ({
+  handleSelectChange,
+  players,
+  index,
+  currentCard,
+}) => {
   const [selected, setSelected] = useState(false);
   const [playerSelected, setPlayerSelected] = useState(null);
 
@@ -379,12 +403,12 @@ const PlayerSelect = ({ handleSelectChange, players, index, currentCard }) => {
         </div>
       </div>
       <div className="">
-      <ul
-            className={`${
-              selected ? 'block' : 'hidden'
-            } absolute bg-white w-48 h-40 overflow-x-hidden overflow-y-auto z-10 rounded-md shadow-lg`}
-            style={{ scrollbarWidth: 'thin', scrollbarColor: '#cbd5e0 #edf2f7' }}
-          > 
+        <ul
+          className={`${
+            selected ? "block" : "hidden"
+          } absolute bg-white w-48 h-40 overflow-x-hidden overflow-y-auto z-10 rounded-md shadow-lg`}
+          style={{ scrollbarWidth: "thin", scrollbarColor: "#cbd5e0 #edf2f7" }}
+        >
           {players.map((player) => (
             <li
               key={player.id}
@@ -404,5 +428,5 @@ const PlayerSelect = ({ handleSelectChange, players, index, currentCard }) => {
     </div>
   );
 };
-}
+
 export default Game;

@@ -67,5 +67,9 @@
         width: 80%;
         font-size: 20px;
     }
+
+    button {
+        cursor: pointer;
+    }
   }
 }

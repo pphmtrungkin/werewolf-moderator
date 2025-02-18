@@ -75,12 +75,20 @@ export default function Players() {
 
   const createGame = async () => {
     if (user) {
-      const { data, error } = await supabase.from("games").insert({deck_id: user.id});
+      const { data, error } = await supabase.from("games").insert({deck_id: user.id}).select("id");
 
       if (error) {
         console.log("Error creating game: ", error.message);
       } else {
         console.log("Game created successfully: ", data);
+      }
+
+      const { data: nightData, error: nightError } = await supabase.from("nights").insert({
+        game_id: data[0].id
+      });
+
+      if (nightError) {
+        console.log("Error creating night: ", nightError.message);
       }
     }
 
