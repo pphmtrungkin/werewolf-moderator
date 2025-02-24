@@ -1,4 +1,4 @@
-import React, { useContext, useState, useEffect } from "react";
+import React, { useContext, useState, useEffect, useCallback, useMemo } from "react";
 import { supabase } from "../supabase";
 import DeckContext from "../components/DeckContext";
 import UserContext from "../components/UserContext";
@@ -19,21 +19,25 @@ const Game = () => {
   const navigate = useNavigate();
   const [actions, setActions] = useState([]);
 
-  const handleCardHolderChange = (index, value) => {
-    const newCardHolder = [...cardHolder];
-    newCardHolder[index] = value;
-    setCardHolder(newCardHolder);
-    console.log("Card Holders: " + newCardHolder);
-  };
+  const handleCardHolderChange = useCallback((index, value) => {
+    setCardHolder((prev) => {
+      const newCardHolder = [...prev];
+      newCardHolder[index] = value;
+      console.log("Card Holders: " + newCardHolder);
+      return newCardHolder;
+    });
+  }, []);
 
-  const handleTargetHolderChange = (index, value) => {
-    const newTargetHolder = [...targetHolder];
-    newTargetHolder[index] = value;
-    setTargetHolder(newTargetHolder);
-    console.log("Target Holders: " + newTargetHolder);
-  };
+  const handleTargetHolderChange = useCallback((index, value) => {
+    setTargetHolder((prev) => {
+      const newTargetHolder = [...prev];
+      newTargetHolder[index] = value;
+      console.log("Target Holders: " + newTargetHolder);
+      return newTargetHolder;
+    });
+  }, []);
 
-  const fetchPlayers = async () => {
+  const fetchPlayers = useCallback(async () => {
     const { data, error } = await supabase
       .from("players")
       .select("*")
@@ -43,9 +47,9 @@ const Game = () => {
       return;
     }
     setPlayers(data);
-  };
+  }, [user.id]);
 
-  const fetchGameId = async () => {
+  const fetchGameId = useCallback(async () => {
     const { data, error } = await supabase
       .from("games")
       .select("id")
@@ -56,37 +60,38 @@ const Game = () => {
       console.error("Error fetching game id: ", error.message);
       return;
     }
-    // get the most recent game id
     setGameId(data[0].id);
     console.log("Game ID: ", data[0].id);
-  };
+  }, [user.id]);
 
   useEffect(() => {
     if (user) {
       fetchPlayers();
       fetchGameId();
     }
-  }, [user]);
+  }, [user, fetchPlayers, fetchGameId]);
 
   // Filter out villager cards
-  const filteredCards = selectedCards.filter((card) => card.id !== 1);
+  const filteredCards = useMemo(() => selectedCards.filter((card) => card.id !== 1), [selectedCards]);
 
-  // Count the occurrences of each card
-  const cardCountMap = filteredCards.reduce((acc, card) => {
-    acc[card.title] = (acc[card.title] || 0) + 1;
-    return acc;
-  }, {});
+  const cardCountMap = useMemo(() => {
+    return filteredCards.reduce((acc, card) => {
+      acc[card.title] = (acc[card.title] || 0) + 1;
+      return acc;
+    }, {});
+  }, [filteredCards]);
 
-  // Remove duplicate cards
-  const uniqueCards = Array.from(new Set(filteredCards.map((a) => a.title)))
-    .map((title) => {
-      return filteredCards.find((a) => a.title === title);
-    })
-    .sort((a, b) => a.id - b.id);
+  const uniqueCards = useMemo(() => {
+    return Array.from(new Set(filteredCards.map((a) => a.title)))
+      .map((title) => {
+        return filteredCards.find((a) => a.title === title);
+      })
+      .sort((a, b) => a.id - b.id);
+  }, [filteredCards]);
 
   const length = uniqueCards.length;
 
-  const handleNext = async () => {
+  const handleNext = useCallback(async () => {
     setChosenPlayers([...cardHolder]);
 
     for (let i = 0; i < cardHolder.length; i++) {
@@ -103,11 +108,11 @@ const Game = () => {
       setTargetHolder([]);
       setCurrentCard((prev) => (prev + 1) % length);
     }
-  };
+  }, [cardHolder, targetHolder, gameId, uniqueCards, currentCard, actions]);
 
-  const handlePrev = () => {
+  const handlePrev = useCallback(() => {
     setCurrentCard((prev) => (prev - 1 + length) % length);
-  };
+  }, [length]);
 
   useEffect(() => {
     if (uniqueCards[currentCard] && uniqueCards[currentCard].actions) {
@@ -116,7 +121,7 @@ const Game = () => {
       setActions([]);
     }
     console.log("Actions: ", actions);
-  }, [currentCard, uniqueCards]);
+  }, [currentCard, uniqueCards, actions]);
 
   const inputBox = (count) => {
     const inputs = [];

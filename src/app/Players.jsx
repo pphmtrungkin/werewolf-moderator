@@ -51,7 +51,7 @@ export default function Players() {
     fetchNumberOfPlayers();
   }, [user]);
 
-  const handleRemovePlayer = async (index) => {
+  const handleRemovePlayer = useCallback(async (index) => {
     const player = players[index];
     const { error: deleteError } = await supabase.storage
       .from("players")
@@ -71,11 +71,11 @@ export default function Players() {
       console.log("Player deleted successfully: ", data);
       fetchPlayers(); // Refresh players list
     }
-  };
+  }, [players, user.id, fetchPlayers]);
 
-  const createGame = async () => {
+  const createGame = useCallback(async () => {
     if (user) {
-      const { data, error } = await supabase.from("games").insert({deck_id: user.id}).select("id");
+      const { data, error } = await supabase.from("games").insert({ deck_id: user.id }).select("id");
 
       if (error) {
         console.log("Error creating game: ", error.message);
@@ -91,10 +91,9 @@ export default function Players() {
         console.log("Error creating night: ", nightError.message);
       }
     }
+  }, [user]);
 
-  };
-
-  const handleStartGame = async () => {
+  const handleStartGame = useCallback(async () => {
     if (players.length < numberOfPlayers && numberOfPlayers != null) {
       alert("Please add more players or you can change the number of players in the set up page");
       return;
@@ -102,10 +101,10 @@ export default function Players() {
       alert("Please remove some players or you can change the number of players in the set up page");
       return;
     } else {
-      createGame();
+      await createGame();
       navigate("/game");
     }
-  }
+  }, [players.length, numberOfPlayers, createGame, navigate]);
 
   return (
     <div>
