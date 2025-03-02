@@ -11,3 +11,4 @@ Currently, two official plugins are available:
 This project is still in development so the way to test is to:
 - Git clone this project
 - Run `npm run dev `
+- Or you can check the website using vercel right here
